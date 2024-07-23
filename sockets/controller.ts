@@ -3,6 +3,7 @@ import { acceptedOrderWorker, cancelOrder, deletePackage, finishOrderWorker, get
 import { Order, Packages } from "../interfaces/order.interface"
 import { getHour } from "../utils/getTime"
 import { getSocketId } from "../controllers/user"
+import { paymentConfirm } from "../controllers/payment"
 
 const controllerSockets =  (io:any, socket:Socket) => {
 
@@ -11,6 +12,7 @@ const controllerSockets =  (io:any, socket:Socket) => {
         if ( arrayHour ) io.to(socket.id).emit('onHour', arrayHour)
 
     })
+    
     socket.on(('postOrder'), async (payload:{ order:Order, uid:string }, callback) =>{
             const result = await postOrders(payload.order, payload.uid)
             const orders = await getOrderUser(payload.uid)
@@ -68,6 +70,7 @@ const controllerSockets =  (io:any, socket:Socket) => {
                 const socketIdUser = await getSocketId(order?.uid)
                 const dataOrder = await getDataOrder(worker)
                 const orderUser = await getOrderUser(order?.uid)
+                //paymentConfirm({stripeId:order?.id, idPayment:order?.idPayment, total:order?.total})
 
                 io.to(socket.id).emit('onOrderId', order)
                 io.to(socket.id).emit('getHistory', history)
@@ -145,7 +148,9 @@ const controllerSockets =  (io:any, socket:Socket) => {
         const res = await cancelOrder(payload.id)
         if ( res != undefined ){
             const orders = await getOrderUser(payload.uid)
+            const order = await getOrderId(payload.id)
             io.to(socket.id).emit('onOrders', orders)
+            io.to(socket.id).emit('onOrderId', order)
             const pending = await getPendingOrders()
             io.emit('onPendingOrders', pending)
             callback({message:'Su orden fue cancelada con éxito'})
@@ -158,9 +163,11 @@ const controllerSockets =  (io:any, socket:Socket) => {
 
         const res = await updateOrder( payload )
         const pending = await getPendingOrders()
-        const orders = await getOrderUser(payload.uid)
+        //const orders = await getOrderUser(payload.uid)
+        const order = await getOrderId(payload.id)
         if ( res != undefined ){
-            io.to(socket.id).emit('onOrders', orders)
+            //io.to(socket.id).emit('onOrders', orders)
+            io.to(socket.id).emit('onOrderId', order)
             io.emit('onPendingOrders', pending)
             callback({message:'Su orden fue actualizada con éxito'})
         }
@@ -193,17 +200,13 @@ const controllerSockets =  (io:any, socket:Socket) => {
         const orders = await getOrderUser(uid)
         const pending = await getPendingOrders()
 
-        if ( packages ){
-            const order = await getOrderId(id)
-            io.to(socket.id).emit('onOrderId', order)
-            
-            callback({message:'Su paquete fue cancelado con éxito',order})
-        }
-        else {
-            callback({message:'Success, orden eliminada', order:[] })
-        }
+
+        const order = await getOrderId(id)
+        io.to(socket.id).emit('onOrderId', order)        
         io.to(socket.id).emit('onOrders', orders)
-        io.emit('onPendingOrders', pending)  
+        io.emit('onPendingOrders', pending)
+        callback({message:'Su paquete fue cancelado con éxito',order})
+
     })
    
     

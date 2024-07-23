@@ -51,7 +51,9 @@ const OrderSchema = new Schema({
     total: Number,
     status: String,
     worker: String,
-    date: String
+    date: String,
+    statusPay: String,
+    idPayment: String
 
     
 }, { versionKey: false })

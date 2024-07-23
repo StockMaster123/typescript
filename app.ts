@@ -14,7 +14,6 @@ import  { payment }  from "./routes/payment";
 
 
 
-
 import http from 'http';
 import { Server, Socket } from "socket.io";
 import conectionDB from "./utils/conectionDB";
@@ -23,10 +22,6 @@ import { worker } from "./routes/worker";
 
 const app = express()
 
-const options = {
-  key: fs.readFileSync('./privateKey.pem'),
-  cert: fs.readFileSync('./certificate.pem'),
-};
 
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -68,5 +63,6 @@ io.on('connection',  (socket:Socket) => {
 });
 
 server.listen(port);
+
 
 export { routers }

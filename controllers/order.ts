@@ -184,14 +184,16 @@ const finishOrderWorker = async (id:string, worker:string) =>{
 
 
 const postOrders = async ( order:Order, uid:string ) => {
-    const { address, time, packages, type} = order
+    const { address, time, packages, type, idPayment } = order
     var total:number = 0
-    packages.map((item:any) =>{
-        total = total + item.total
-    })
-    var newOrder = await orderModel.create({ uid, packages, address, time, type, total, status:'pending', worker:''})
-    return newOrder
-   
+    if ( packages.length >= 1){
+        packages.map((item:any) =>{
+            total = total + item.total
+        })
+        var newOrder = await orderModel.create({ uid, packages, address, time, type, total, status:'pending', worker:'', idPayment })
+        return newOrder
+    }
+    else return null
     
 }
 

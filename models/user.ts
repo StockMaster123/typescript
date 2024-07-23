@@ -10,6 +10,7 @@ const UserSchema = new Schema({
     rol : String,
     status: String,
     type: String,
+    stripeId: String,
     socketId: String
 
 }, { versionKey: false })

@@ -25,7 +25,8 @@ interface Order{
     }
     total: number,
     status: 'pending' | 'accepted' | 'finished' | 'canceled',
-    worker: Worker
+    worker: Worker,
+    idPayment: string
 
 }
 

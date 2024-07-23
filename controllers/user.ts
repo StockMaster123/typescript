@@ -8,6 +8,8 @@ import { getToken } from "../utils/getToken";
 import { findWorker } from "../utils/findWorker";
 import { findUserEmail } from "../utils/findUserEmail";
 import { findUserId } from "../utils/findUserId";
+import { createUserStripe } from "../utils/createUserStripe";
+
 
 const getUser = async ( uid:string, res:Response) => {
     try {
@@ -67,6 +69,8 @@ const getSocketId = async ( uid:string | undefined) => {
 
 const postUser = async ( { username, email, password }: Users, res: Response) => {
 
+
+
     try {
         if ( !( username && email && password ) ){
             
@@ -78,8 +82,9 @@ const postUser = async ( { username, email, password }: Users, res: Response) =>
     
                 if( resultValidate ){
                     var encryptPassword = hashSync(password,10)
+                    var customer = await createUserStripe(username,email)
                     var uid = crypto.randomUUID()
-                    var newUser:any = await userModel.create({ uid, username, img:'', email, password:encryptPassword, rol:'cliente', status:'active', type:'email-password', socketId:'' })
+                    var newUser:any = await userModel.create({ uid, username, img:'', email, password:encryptPassword, rol:'cliente', status:'active', type:'email-password', socketId:'', stripeId:customer.id })
                     var token = await getToken(newUser)
                     res.status(200).json(token)
                 }
@@ -88,6 +93,7 @@ const postUser = async ( { username, email, password }: Users, res: Response) =>
         else errorHandle("Algo a ocurrido al intentar crear tu usuario", res)
         
     } catch (error) {
+        console.log(error)
         errorHandle("Vaya, algo a ocurrido", res)
     }
 
@@ -123,8 +129,10 @@ const postUserGoogle = async ({ username, email, img }:any, res:Response) =>{
         }
         var user  = await findUserEmail(email)
         if ( user == null) {
+
                     var uid = crypto.randomUUID()
-                    var newUser:any = await userModel.create({ uid, username, img, email, rol:'cliente', status:'active', type:'google-user' })
+                    var customer = createUserStripe(username, email)
+                    var newUser:any = await userModel.create({ uid, username, img, email, rol:'cliente', status:'active', type:'google-user', stripeId:customer, socketId:'' })
                     var token = await getToken(newUser)
                     res.status(200).json(token)
         }

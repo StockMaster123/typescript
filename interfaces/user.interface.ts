@@ -4,5 +4,7 @@ export interface Users {
     username : string,
     email : string,
     password : string,
+    socketId: string,
+    stripeId: string,
     rol : 'cliente' | 'proveedor' | 'administrador' 
 }
