@@ -29,7 +29,7 @@
   "scripts": {
     "tsc": "tsc",
     "dev": "nodemon app.ts",
-    "start": "node app.js",
+    "start": "node app.ts",
     "test-socket": "DEBUG=socket.io* node app.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
