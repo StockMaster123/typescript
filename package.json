@@ -26,6 +26,7 @@
   "name": "eaglesmobilewash",
   "version": "1.0.0",
   "main": "app.ts",
+  "type": "module"
   "scripts": {
     "tsc": "tsc",
     "dev": "nodemon app.ts",
